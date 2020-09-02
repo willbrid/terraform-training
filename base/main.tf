@@ -24,7 +24,7 @@ resource "aws_security_group" "instance" {
 
 # This is a single-line comment. ami-0bcc094591f354be2 for ubuntu 18.04
 resource "aws_instance" "base" {
-  ami = "ami-0083662ba17882949"
+  ami = "ami-0bcc094591f354be2"
   instance_type = "t2.micro"
   vpc_security_group_ids = [aws_security_group.instance.id]
 
