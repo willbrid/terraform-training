@@ -5,7 +5,24 @@ provider "aws" {
   region = "us-east-1"
 }
 
-# This is a single-line comment.
+variable "server_port" {
+  description = "The port the server will use for HTTP requests"
+  type = number
+  default = 8080
+}
+
+resource "aws_security_group" "instance" {
+  name = "terraform-example-instance"
+  
+  ingress {
+    from_port = var.server_port
+    to_port = var.server_port
+    protocol = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+# This is a single-line comment. ami-0bcc094591f354be2 for ubuntu 18.04
 resource "aws_instance" "base" {
   ami = "ami-0083662ba17882949"
   instance_type = "t2.micro"
@@ -14,7 +31,7 @@ resource "aws_instance" "base" {
   user_data = <<-EOF
                 #!/bin/bash
                 echo "Hello, World" > index.html
-                nohup busybox httpd -f -p 8080 &
+                nohup busybox httpd -f -p ${var.server_port} &
                 EOF
 
   tags = {
@@ -22,13 +39,7 @@ resource "aws_instance" "base" {
   }
 }
 
-resource "aws_security_group" "instance" {
-  name = "terraform-example-instance"
-  
-  ingress {
-    from_port = 8080
-    to_port = 8080
-    protocol = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
+output "public_ip" {
+  value = aws_instance.base.public_ip
+  description = "The public IP address of the web server"
 }
